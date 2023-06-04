@@ -1,0 +1,40 @@
+server:
+  port: 8090
+  error:
+    include-message: always
+spring:
+  application:
+    name: ProjectSeeker
+  data:
+    mongodb:
+      uri: mongodb+srv://megasauriojr:triceratos12@projectseekermongodbclu.oj7okuv.mongodb.net/
+      database: ProjectSeekerDB
+security:
+  firebase-props:
+    service_account: service_account.json
+    enable-check-session-revoked: true
+  cookie-props:
+    max-age-in-minutes: 60
+    secure: false
+    path: /
+  private-apis:
+    - /api/secured/**
+    - /api/session/logout
+    - /api/session/logout-everywhere
+    - /api/session/refresh
+    - /api/session/me
+  valid-application-roles:
+    user: ROLE_USER
+    client: ROLE_CLIENT
+    freelancer: ROLE_FREELANCER
+    superAdmin: ROLE_SUPER_ADMIN
+  super-admins:
+    - jorgetargz@gmail.com
+    - jmartin44@educa.madrid.org
+springdoc:
+  api-docs:
+    path: /api-docs
+  packagesToScan: com.jorgetargz.projectseekerspringboot.controllers
+  pathsToMatch: /api/**
+  swagger-ui:
+    path: /swagger-ui.html

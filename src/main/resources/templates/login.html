@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+
+        .error-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: red;
+            color: white;
+            padding: 10px;
+            display: none;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="error-banner" id="errorBanner"></div>
+<div class="container">
+    <img src="/logo.svg" alt="Project Seeker Logo" class="logo">
+    <h1 class="text-center">Iniciar Sesión</h1>
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Contraseña:</label>
+            <input type="password" class="form-control" id="password" required>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+        </div>
+    </form>
+</div>
+<script type="module">
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"
+    import {getAuth, signInWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCYUdNkjl6q58tf9PC8TBSAP90XcZT-_6s",
+        authDomain: "hireme-tfg.firebaseapp.com",
+        databaseURL: "https://hireme-tfg-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "hireme-tfg",
+        storageBucket: "hireme-tfg.appspot.com",
+        messagingSenderId: "489943485848",
+        appId: "1:489943485848:web:28e720764b645b0be1afed",
+        measurementId: "G-6K77YCQTPS"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    // Obtiene una referencia aal formulario de inicio de sesión
+    const loginForm = document.getElementById('loginForm');
+
+    // Escucha el evento 'submit' del formulario
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Obtiene los valores de email y contraseña del formulario
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        // Inicia sesión con Firebase
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Obtiene el token de inicio de sesión del usuario
+                userCredential.user.getIdToken()
+                    .then((idToken) => {
+                        if (idToken !== null) {
+                            console.log('Token obtenido:', idToken);
+                            sendTokenToServer(idToken);
+                        } else {
+                            throw new Error('Error al obtener el token');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error al obtener el token:', error);
+                        displayErrorMessage('Error al iniciar sesión. Por favor, revisa los datos introducidos.');
+                    });
+            })
+            .catch((error) => {
+                console.error('Error en el inicio de sesión:', error);
+                displayErrorMessage('Error al iniciar sesión. Por favor, revisa los datos introducidos.');
+            });
+    });
+
+    // Función para enviar el token al servidor Spring Boot
+    function sendTokenToServer(token) {
+        // Realiza una solicitud POST al servidor con el token
+        fetch('api/session/login', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+            .then((response) => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('Error en la solicitud al servidor');
+                }
+            })
+            .then((data) => {
+                // Maneja la respuesta del servidor
+                console.log(data);
+                goToSwaggerUI();
+            })
+            .catch((error) => {
+                console.error('Error en la comunicación con el servidor:', error);
+                displayErrorMessage('Error en la comunicación con el servidor. Por favor, inténtalo de nuevo más tarde.');
+            });
+    }
+
+    function goToSwaggerUI() {
+        window.location.href = 'swagger-ui.html';
+    }
+
+    function displayErrorMessage(message) {
+        const errorBanner = document.getElementById('errorBanner');
+        errorBanner.textContent = message;
+        errorBanner.style.display = 'block';
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-seeker-deployment
+  labels:
+    app: project-seeker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-seeker
+  template:
+    metadata:
+      labels:
+        app: project-seeker
+    spec:
+      containers:
+        - name: project-seeker
+          image: europe-west1-docker.pkg.dev/hireme-tfg/project-seeker/project-seeker:latest
+          ports:
+            - containerPort: 8090
