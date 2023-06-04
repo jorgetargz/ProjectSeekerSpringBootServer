@@ -21,7 +21,7 @@ on:
 env:
   PROJECT_ID: hireme-tfg
   GAR_LOCATION: europe-west1
-  GKE_CLUSTER: project-seeker-cluster1
+  GKE_CLUSTER: project-seeker-cluster
   GKE_ZONE: europe-west1-d
   DEPLOYMENT_NAME: project-seeker-deployment
   REPOSITORY: project-seeker
